@@ -42,7 +42,9 @@ proc parseCsv {csvLines} {
 	return $hashmap
 }
 
-puts stderr "usage: hashdeep-compare <file-one> <file-two>\n"
+if {[llength $argv] != 2} {
+	puts "usage: hashdeep-compare <file-one> <file-two>"
+}
 puts stderr "comparing: $argv"
 
 set firstFile [lindex $argv 0]
