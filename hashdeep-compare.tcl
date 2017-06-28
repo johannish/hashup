@@ -63,14 +63,24 @@ set indexTwo [parseCsv $secondLines]
 
 #puts "Name of hash (file1) is: [dict get [dict get $indexOne 89b337fd82777c2efdaabb11594d4dd5] filename]"
 
+proc shouldIncludeFile {filename} {
+	foreach excludeDir [list {.cache} {.gimp-2.8} {.config} {.dropbox-dist} {.thunderbird} {.vim} {.npm}\
+			{.thumbnails} {.git} {.macromedia} {.mozilla} {.gnome} {.local} {node_modules} {StockStack} {nupic}] {
+		if {[string match "*/$excludeDir/*" $filename]} {
+			return false
+		}
+	}
+	return true
+}
+
 foreach hash [dict keys $indexTwo] {
 	#puts "looking for $hash"
 	set fileMetadata [dict get $indexTwo $hash]
 	#puts "metadata| $fileMetadata"
 	set filename [dict get $fileMetadata filename]
-	if {[dict exists $indexOne $hash]} {
-		#puts "in both files: $hash"
-	} else {
-		puts "only in file 2: $hash ($filename)"
+	if {[shouldIncludeFile $filename]} {
+		if {![dict exists $indexOne $hash]} {
+			puts "only in file 2: $hash ($filename)"
+		}
 	}
 }
