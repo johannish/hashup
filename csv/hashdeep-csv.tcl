@@ -23,9 +23,14 @@ proc ::hashdeepCsv::parseCsv {hashdeepOutputCsv} {
 		set parts [split $line ,]
 		set keyValPairs {}
 
-		for {set i 0} {$i < [llength $columns]} {incr i} {
+		set columnCountExceptLast [expr {[llength $columns] -1}]
+		for {set i 0} {$i < $columnCountExceptLast} {incr i} {
 			dict append keyValPairs [lindex $columns $i] [lindex $parts $i]
 		}
+
+		# Hackish way to handle filenames with commas in them (reconstructing filename)
+		set filepath [join [lrange $parts $columnCountExceptLast end] ","]
+		dict append keyValPairs filename $filepath
 
 		dict set hashmap [dict get $keyValPairs md5] $keyValPairs
 	}

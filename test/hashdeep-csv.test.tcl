@@ -14,7 +14,7 @@ source ../csv/hashdeep-csv.tcl
 ##
 2761139,$file1Md5,$file1Sha1,/media/moo/file.txt
 4034402,d3bd60842b030b94c168c2e730bb26e6,fake-sha1,/media/moo/file2.txt"
-	
+
 	set result [::hashdeepCsv::parseCsv $csvOutput]
 	set file1 [dict get $result $file1Md5]
 	return [expr {
@@ -36,7 +36,7 @@ source ../csv/hashdeep-csv.tcl
 ##
 $file1Md5,1234,/media/moo/file.txt
 d3bd60842b030b94c168c2e730bb26e6,4567,/media/moo/file2.txt"
-	
+
 	set result [::hashdeepCsv::parseCsv $csvOutput]
 	set file1 [dict get $result $file1Md5]
 	return [expr {
@@ -52,7 +52,7 @@ d3bd60842b030b94c168c2e730bb26e6,4567,/media/moo/file2.txt"
 	set file1Md5 f441b34188a3a5e8ad0fcfa18eb81298
 	set csvOutput "%%%% BLAH
 %%%% size,md5,sha1,filename"
-	
+
 	catch {::hashdeepCsv::parseCsv $csvOutput} result options
 	return [dict get $options -code]
 } -cleanup {
@@ -64,11 +64,32 @@ d3bd60842b030b94c168c2e730bb26e6,4567,/media/moo/file2.txt"
 	set file1Md5 f441b34188a3a5e8ad0fcfa18eb81298
 	set csvOutput "%%%% HASHDEEP-1.0
 %%%% size,sha1,filename"
-	
+
 	catch {::hashdeepCsv::parseCsv $csvOutput} result options
 	return [expr {
 		[dict get $options -code] == 1
 		&& [string match "*Arbitrary limitation*" [dict get $options -errorinfo]]
+	}]
+} -cleanup {
+} -result 1
+
+::tcltest::test parseCsv_handlesCrazyFilenames_assumesFilenameLast {
+} -setup {
+} -body {
+	set file1Md5 fileOneHash
+	set file2Md5 fileTwoHash
+	set filenameOne "/media/moo/some, file, with, commas.txt"
+	set filenameTwo "/media/moo/some`; : ?<> & * {}\".txt"
+	set csvOutput "%%%% HASHDEEP-1.0
+%%%% size,md5,sha1,filename
+## Invoked from: /media/moo
+2761139,$file1Md5,fake-sha1,$filenameOne
+2761139,$file2Md5,fake-sha1,$filenameTwo"
+
+	set result [::hashdeepCsv::parseCsv $csvOutput]
+	return [expr {
+		[dict get [dict get $result $file1Md5] filename] == $filenameOne
+		&& [dict get [dict get $result $file2Md5] filename] == $filenameTwo
 	}]
 } -cleanup {
 } -result 1
