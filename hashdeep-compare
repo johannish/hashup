@@ -19,8 +19,14 @@ set fp [open $secondFile r]
 set secondLines [read $fp]
 close $fp
 
-set indexOne [::hashdeepCsv::parseCsv $firstLines] 
-set indexTwo [::hashdeepCsv::parseCsv $secondLines] 
+if {[catch {::hashdeepCsv::parseCsv $firstLines} indexOne options]} {
+	puts "CAUGHT: $options"
+	exit 1;
+}
+if {[catch {::hashdeepCsv::parseCsv $secondLines} indexTwo options]} {
+	puts "CAUGHT: $options"
+	exit 1;
+}
 
 #puts "Name of hash (file1) is: [dict get [dict get $indexOne 89b337fd82777c2efdaabb11594d4dd5] filename]"
 
