@@ -14,6 +14,8 @@ proc ::hashdeepCsv::parseCsv {hashdeepOutputCsv} {
 		error "Arbitrary limitation of this program: each csv line must contain an md5 hash"
 	}
 
+	set runPath [regsub {^## Invoked from: } [lindex $lines 2] {}]
+
 	foreach line $lines {
 		set firstchar [string index $line 0]
 		if {$firstchar == "%" || $firstchar == "#"} {
@@ -30,7 +32,15 @@ proc ::hashdeepCsv::parseCsv {hashdeepOutputCsv} {
 
 		# Hackish way to handle filenames with commas in them (reconstructing filename)
 		set filepath [join [lrange $parts $columnCountExceptLast end] ","]
-		dict append keyValPairs filename $filepath
+
+		set filenameStartIndex [expr {[string last [file separator] $filepath]} + 1]
+		set filename [string range $filepath $filenameStartIndex end]
+		set relativeFilepath [regsub "^$runPath[file separator]" $filepath {}]
+		set relativeFileDir [string replace $relativeFilepath [string last "$filename" $relativeFilepath] end]
+
+		dict append keyValPairs filepath $filepath
+		dict append keyValPairs filename $filename
+		dict append keyValPairs relativeDir $relativeFileDir
 
 		dict set hashmap [dict get $keyValPairs md5] $keyValPairs
 	}
