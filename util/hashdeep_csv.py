@@ -8,10 +8,13 @@ class HashdeepCsvHeader:
 	csv_column_names: list
 	invoked_dir: str
 	invoked_cmd: str
+	line_count: int
 
 def parse_header(hashdeepHeaderLines):
 	# TODO: this is stupid. What's the Pythonic approach to a plain data object with optional fields?
-	header = HashdeepCsvHeader('','','','')
+	header = HashdeepCsvHeader('',[],'','',0)
+
+	header.line_count = len(hashdeepHeaderLines)
 
 	for line in hashdeepHeaderLines:
 		match = re.search('%%%%.*(HASHDEEP-[^\s]+)', line)
@@ -21,7 +24,7 @@ def parse_header(hashdeepHeaderLines):
 
 		match = re.search('%%%% (size,.*)', line)
 		if match is not None:
-			header.csv_column_names = match.group(1)
+			header.csv_column_names = list(map(str.strip, match.group(1).split(',')))
 			continue
 
 		match = re.search('## Invoked from: (.*)', line)
