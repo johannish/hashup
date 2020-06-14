@@ -4,3 +4,4 @@ output.txt
 
 __pycache__
 *.py[cod]
+*.db
