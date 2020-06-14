@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+import ntpath
 
 from datetime import datetime
 
@@ -22,7 +23,25 @@ def load_csv(header, filename, tablename=None, dbfilename=None):
 				continue
 			# assumes filename is last in output, and is the only field that contains the delimiter
 			fields = line.split(delimiter, maxsplit=len(header.csv_column_names) - 1)
+
+			data_filepath = fields[-1]
+			## these extra fields double (or more) the size of the database and the execution time
+			## and are of questionable value
+			# relativepath = data_filepath.replace(header.invoked_dir, '')
+			# fields.append(relativepath)
+			# dirname = ntpath.dirname(data_filepath)
+			# fields.append(dirname)
+
+			# use ntpath as we might be processing windows filenames on linux
+			# see: https://stackoverflow.com/a/8384788
+			leafname = ntpath.basename(data_filepath)
+			fields.append(leafname)
+
 			rows.append(fields)
+
+	# header.csv_column_names.append('relativepath')
+	# header.csv_column_names.append('dirname')
+	header.csv_column_names.append('leafname')
 	
 	df = pd.DataFrame(data=rows, columns=header.csv_column_names)
 
@@ -54,6 +73,9 @@ def read_count(tablename, dbfilename):
 def get_sqlite3_connection(dbfilename):
 	# TODO: figure out how to manage `conn.close()` lifecycle while allowing a toggle
 	# between in-memory (where close() is irrelevant) and on-disk db.
+	#  see: https://stackoverflow.com/a/51456087
+	#  see: https://stackoverflow.com/a/32681822
+	#  see: https://www.sqlite.org/inmemorydb.html
 	# if dbfilename is None:
 		# if conn is None:
 			# print('using in memory db')
