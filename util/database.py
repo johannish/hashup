@@ -5,6 +5,9 @@ from datetime import datetime
 
 conn = None
 
+def filesafe_timestamp():
+	return datetime.now().isoformat().replace('-','').replace(':','').replace('.','')
+
 def load_csv(header, filename, tablename=None, dbfilename=None):
 	delimiter = ','
 	# can't use pandas read_csv because of unquoted filenames with delimiter
@@ -24,11 +27,11 @@ def load_csv(header, filename, tablename=None, dbfilename=None):
 	df = pd.DataFrame(data=rows, columns=header.csv_column_names)
 
 	if dbfilename is None:
-		dbfilename = datetime.now().isoformat().replace('-','').replace(':','').replace('.','') + '.db'
+		dbfilename = filesafe_timestamp() + '.db'
 	conn = get_sqlite3_connection(dbfilename)
 
 	if tablename is None:
-		tablename = datetime.now().isoformat().replace('-','').replace(':','').replace('.','')
+		tablename = filesafe_timestamp()
 	df.to_sql(tablename, conn)
 
 	conn.close()
