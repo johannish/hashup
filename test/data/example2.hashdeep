@@ -1,0 +1,11 @@
+%%%% HASHDEEP-1.0
+%%%% size,md5,filename
+## Invoked from: /mnt/disk/hashdeep-utils
+## $ hashdeep -c md5 -r .
+## 
+1671,21ffb045d0e4d3bc5552682b844fdecf,/mnt/disk/hashdeep-utils/readme.md
+1869,853d0aed515c837d3205ca923ef023ee,/mnt/disk/hashdeep-utils/hashdeep-compare
+6067,728c196388a2017e18c92cb77cde0e53,/mnt/disk/hashdeep-utils/Pipfile.lock
+1205,4c61d659e8516e80e815e9f66dfe9cc2,/mnt/disk/hashdeep-utils/util/hashdeep_csv.py
+2848,7941857dcd6e67e3fc29af1fa6d77d08,/mnt/disk/hashdeep-utils/util/database.py
+2840,00000000006e67e3fc29af1fa6d77d08,/mnt/disk/hashdeep-utils/anotherfile.ext

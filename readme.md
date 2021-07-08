@@ -48,6 +48,7 @@ limit 10;
 
 ## developing
 ### running unit tests
+From root of project:
 ```
 python -m unittest discover
 ```

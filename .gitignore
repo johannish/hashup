@@ -1,6 +1,5 @@
 output
 output.txt
-/test/data/
 
 __pycache__
 *.py[cod]

@@ -11,13 +11,14 @@ def filesafe_timestamp():
 
 def load_csv(header, filename, tablename=None, dbfilename=None):
 	delimiter = ','
-	# can't use pandas read_csv because of unquoted filenames with delimiter
+	# can't use pandas read_csv because of unquoted filenames with delimiter in hashdeep output
 	#df = pd.read_csv(filename, names=header.csv_column_names, skiprows=header.line_count)
 	rows = []
 	with open(filename, 'r') as file:
 		firstline = file.readline()
 		if not firstline.find('HASHDEEP') > -1:
-			raise Exception(f'File "{filename}" is not in hashdeep csv format. Start of first line is "{firstline[:80]}"')
+			raise RuntimeError(f'File "{filename}" is not in hashdeep csv format.'
+				+ f'\nExpected firstline containing "HASHDEEP", but was "{firstline[:80]}..."')
 		for line in file:
 			if line.startswith('%') or line.startswith('#'):
 				continue
