@@ -2,6 +2,7 @@ import unittest
 
 from util.hashdeep_csv import parse_header
 from util.hashdeep_csv import read_header
+from util.hashdeep_csv import parse_csv
 
 class HashdeepCsvTest(unittest.TestCase):
 	def test_parse_header(self):
@@ -22,3 +23,8 @@ class HashdeepCsvTest(unittest.TestCase):
 	def test_read_header(self):
 		results = read_header('test/data/example.hashdeep')
 		self.assertEqual(len(results), 5)
+
+	def test_parse_csv_exception(self):
+		testfile = 'test/data/nothashdeep.txt'
+		headers = parse_header(read_header(testfile))
+		self.assertRaises(RuntimeError, parse_csv, headers, testfile)

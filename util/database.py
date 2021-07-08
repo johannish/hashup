@@ -1,6 +1,4 @@
 import sqlite3
-import pandas as pd
-import ntpath
 
 from datetime import datetime
 
@@ -9,50 +7,14 @@ conn = None
 def filesafe_timestamp():
 	return datetime.now().isoformat().replace('-','').replace(':','').replace('.','')
 
-def load_csv(header, filename, tablename=None, dbfilename=None):
-	delimiter = ','
-	# can't use pandas read_csv because of unquoted filenames with delimiter in hashdeep output
-	#df = pd.read_csv(filename, names=header.csv_column_names, skiprows=header.line_count)
-	rows = []
-	with open(filename, 'r') as file:
-		firstline = file.readline()
-		if not firstline.find('HASHDEEP') > -1:
-			raise RuntimeError(f'File "{filename}" is not in hashdeep csv format.'
-				+ f'\nExpected firstline containing "HASHDEEP", but was "{firstline[:80]}..."')
-		for line in file:
-			if line.startswith('%') or line.startswith('#'):
-				continue
-			# assumes filename is last in output, and is the only field that contains the delimiter
-			fields = line.split(delimiter, maxsplit=len(header.csv_column_names) - 1)
-
-			data_filepath = fields[-1]
-			## these extra fields double (or more) the size of the database and the execution time
-			## and are of questionable value
-			# relativepath = data_filepath.replace(header.invoked_dir, '')
-			# fields.append(relativepath)
-			# dirname = ntpath.dirname(data_filepath)
-			# fields.append(dirname)
-
-			# use ntpath as we might be processing windows filenames on linux
-			# see: https://stackoverflow.com/a/8384788
-			leafname = ntpath.basename(data_filepath)
-			fields.append(leafname)
-
-			rows.append(fields)
-
-	# header.csv_column_names.append('relativepath')
-	# header.csv_column_names.append('dirname')
-	header.csv_column_names.append('leafname')
-	
-	df = pd.DataFrame(data=rows, columns=header.csv_column_names)
-
+def load_dataframe(hashdeep_data, tablename=None, dbfilename=None):
 	if dbfilename is None:
 		dbfilename = filesafe_timestamp() + '.db'
 	conn = get_sqlite3_connection(dbfilename)
 
 	if tablename is None:
 		tablename = filesafe_timestamp()
-	df.to_sql(tablename, conn)
+	hashdeep_data.to_sql(tablename, conn)
 
 	conn.close()
 
