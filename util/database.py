@@ -21,14 +21,31 @@ def load_dataframe(hashdeep_data, tablename=None, dbfilename=None):
 	return (dbfilename, tablename)
 
 def scrub(tablename):
+	# thanks to https://stackoverflow.com/a/3247553/
 	return ''.join( chr for chr in tablename if chr.isalnum() )
 
 def read_count(tablename, dbfilename):
 	conn = get_sqlite3_connection(dbfilename)
 
 	c = conn.cursor()
-	c.execute(f'select count(*) from {scrub(tablename)}') # BEWARE SQL INJECTION.
+	c.execute(f'select count(*) from "{scrub(tablename)}"') # BEWARE SQL INJECTION.
 	result = c.fetchone()[0]
+	conn.close()
+
+	return result
+
+def read_not_in_table2(tablename1, tablename2, dbfilename):
+	conn = get_sqlite3_connection(dbfilename)
+
+	c = conn.cursor()
+	sql = '''
+		select *
+		from "{table1}" as t1
+			left join "{table2}" as t2 on t1.md5 = t2.md5
+		where t2.md5 is null
+		'''.format(table1=scrub(tablename1), table2=scrub(tablename2))
+	c.execute(sql)
+	result = c.fetchall() #TODO: return an object representing the file metadata
 	conn.close()
 
 	return result
