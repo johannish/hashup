@@ -1,25 +1,17 @@
 import sys
 
 # TODO: I really just want to import the whole module, and call it like `module.read_header`, etc
-from util.hashdeep_csv import read_header
-from util.hashdeep_csv import parse_header
-from util.hashdeep_csv import parse_csv
-from util.database import load_dataframe
-from util.database import read_count
-from util.database import read_not_in_table2
+from util.files import load_file
+from util.files import count
+from util.files import missing_from_right
 
 def diff(args):
 	print(f'files in {args.compare} but not in {args.reference}:', file=sys.stderr)
-	header = parse_header(read_header(args.compare))
-	dataframe = parse_csv(header, args.compare)
-	dbfname, tablename_compare = load_dataframe(dataframe)
+	fileid_compare = load_file(args.compare)
+	fileid_reference = load_file(args.reference)
 
-	header = parse_header(read_header(args.reference))
-	dataframe = parse_csv(header, args.reference)
-	_, tablename_reference = load_dataframe(dataframe, dbfilename=dbfname)
+	print('row count in compare:  ', count(fileid_compare))
+	print('row count in reference:', count(fileid_reference))
 
-	print('row count in compare:  ', read_count(tablename_compare, dbfname))
-	print('row count in reference:', read_count(tablename_reference, dbfname))
-
-	missing_from_reference = read_not_in_table2(tablename_compare, tablename_reference, dbfname)
+	missing_from_reference = missing_from_right(fileid_compare, fileid_reference)
 	print(f'not in reference: {missing_from_reference}')
