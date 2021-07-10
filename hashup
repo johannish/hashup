@@ -16,10 +16,10 @@ parser_diff.add_argument('reference', help='the original "benchmark" file')
 parser_diff.add_argument('-l', '--listout', action='store_true', help='list fields on stdout')
 parser_diff.set_defaults(func=commands.diff)
 
-parser_diff = subparsers.add_parser('info', help='print generic information about the hashdeep file')
-parser_diff.add_argument('file', help='a hashdeep output file')
-parser_diff.add_argument('-f', '--format', default='csv', help='hashdeep format: one of {csv}')
-parser_diff.set_defaults(func=commands.info)
+parser_info = subparsers.add_parser('info', help='print generic information about the hashdeep file')
+parser_info.add_argument('file', help='a hashdeep output file')
+parser_info.add_argument('-f', '--format', default='csv', help='hashdeep format: one of {csv}')
+parser_info.set_defaults(func=commands.info)
 
 if len(sys.argv)==1:
     parser.print_help(sys.stderr)
