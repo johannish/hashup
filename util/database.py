@@ -1,4 +1,5 @@
 import sqlite3
+import sys
 
 from datetime import datetime
 
@@ -17,7 +18,7 @@ def load_dataframe(hashdeep_data, tablename=None, dbfilename=None):
 	try:
 		hashdeep_data.to_sql(tablename, conn)
 	except ValueError as e:
-		print('Table likely exists. Pandas error was:', e) #TODO verbose logging
+		print('Table likely exists. Pandas error was:', e, file=sys.stderr) #TODO verbose logging
 
 	conn.close()
 
