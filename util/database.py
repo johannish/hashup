@@ -43,17 +43,38 @@ def read_not_in_table2(tablename1, tablename2, dbfilename):
 	conn.row_factory = sqlite3.Row # creates an efficient dict-like object
 
 	c = conn.cursor()
+	join_hash = find_best_join_hash(tablename1, tablename2, c)
+	print('Comparing datasets using hash', join_hash, file=sys.stderr) #TODO verbose logging
 	sql = '''
 		select *
 		from "{table1}" as t1
-			left join "{table2}" as t2 on t1.md5 = t2.md5
-		where t2.md5 is null
-		'''.format(table1=scrub(tablename1), table2=scrub(tablename2))
+			left join "{table2}" as t2 on t1.{join_col} = t2.{join_col}
+		where t2.{join_col} is null
+		'''.format(table1=scrub(tablename1), table2=scrub(tablename2), join_col=join_hash)
 	c.execute(sql)
 	results = c.fetchall()
 	conn.close()
 
 	return results
+
+# in order of preference from most preferred to least
+HASHDEEP_SUPPORTED_HASHES=['whirlpool','tiger','sha256','sha1','md5']
+
+def find_best_join_hash(tablename1, tablename2, cursor):
+	placeholders = ','.join('?' for i in HASHDEEP_SUPPORTED_HASHES)
+	sql = '''select name from pragma_table_info("{table}") where name in ({placeholders});'''
+
+	cursor.execute(sql.format(table=scrub(tablename1), placeholders=placeholders), HASHDEEP_SUPPORTED_HASHES)
+	table1_hashes = [row['name'] for row in cursor.fetchall()]
+
+	cursor.execute(sql.format(table=scrub(tablename2), placeholders=placeholders), HASHDEEP_SUPPORTED_HASHES)
+	table2_hashes = [row['name'] for row in cursor.fetchall()]
+
+	for h in HASHDEEP_SUPPORTED_HASHES:
+		if h in table1_hashes and h in table2_hashes:
+			return h
+
+	assert False, f"Could not find common hash function between {table1_hashes} and {table2_hashes}"
 
 def get_sqlite3_connection(dbfilename):
 	# TODO: figure out how to manage `conn.close()` lifecycle while allowing a toggle
