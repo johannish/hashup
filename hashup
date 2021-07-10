@@ -11,8 +11,8 @@ parser = argparse.ArgumentParser(description=utilDescription)
 subparsers = parser.add_subparsers(required=True, title='commands', description='available commands', help='additional')
 
 parser_diff = subparsers.add_parser('diff', help='show logical differences in files')
-parser_diff.add_argument('reference', help='the original "benchmark" file')
 parser_diff.add_argument('compare', help='the file to check against the benchmark')
+parser_diff.add_argument('reference', help='the original "benchmark" file')
 parser_diff.add_argument('-l', '--listout', action='store_true', help='list fields on stdout')
 parser_diff.set_defaults(func=commands.diff)
 

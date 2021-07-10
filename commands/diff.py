@@ -6,8 +6,6 @@ from util.files import count
 from util.files import missing_from_right
 
 def diff(args):
-	print(f'files in {args.compare} but not in {args.reference}:', file=sys.stderr)
-
 	fileid_compare = load_file(args.compare)
 	fileid_reference = load_file(args.reference)
 
@@ -18,5 +16,6 @@ def diff(args):
 		print('row count in reference:', count(fileid_reference))
 		print(f'missing from reference: {len(missing_from_reference)}')
 	else:
+		print(f'files in {args.compare} but not in {args.reference}:', file=sys.stderr)
 		for m in missing_from_reference:
 			print(m)
