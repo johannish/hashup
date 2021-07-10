@@ -64,8 +64,9 @@ def parse_csv(header, filename):
 				continue
 			# assumes filename is last in output, and is the only field that contains the delimiter
 			fields = line.split(delimiter, maxsplit=len(header.csv_column_names) - 1)
+			data_filepath = fields.pop().replace('\n','')
+			fields.append(data_filepath)
 
-			data_filepath = fields[-1]
 			## these extra fields double (or more) the size of the database and the execution time
 			## and are of questionable value
 			# relativepath = data_filepath.replace(header.invoked_dir, '')
