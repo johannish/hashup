@@ -39,6 +39,7 @@ def read_count(tablename, dbfilename):
 
 def read_not_in_table2(tablename1, tablename2, dbfilename):
 	conn = get_sqlite3_connection(dbfilename)
+	conn.row_factory = sqlite3.Row # creates an efficient dict-like object
 
 	c = conn.cursor()
 	sql = '''
@@ -48,10 +49,10 @@ def read_not_in_table2(tablename1, tablename2, dbfilename):
 		where t2.md5 is null
 		'''.format(table1=scrub(tablename1), table2=scrub(tablename2))
 	c.execute(sql)
-	result = c.fetchall() #TODO: return an object representing the file metadata
+	results = c.fetchall()
 	conn.close()
 
-	return result
+	return results
 
 def get_sqlite3_connection(dbfilename):
 	# TODO: figure out how to manage `conn.close()` lifecycle while allowing a toggle

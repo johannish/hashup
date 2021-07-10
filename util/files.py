@@ -19,6 +19,7 @@ def file_id(filename):
 dbname = 'main.db'
 
 def load_file(hashdeep_filename):
+	# TODO: don't make 3 filesystem calls here
 	header = parse_header(read_header(hashdeep_filename))
 	dataframe = parse_csv(header, hashdeep_filename)
 	fileid = file_id(hashdeep_filename)
@@ -30,4 +31,7 @@ def count(fileid):
 	return read_count(fileid, dbname)
 
 def missing_from_right(fileid_left, fileid_right):
-	return read_not_in_table2(fileid_left, fileid_right, dbname)
+	#TODO make this dynamic: tell the user what the available columns are, and let them pass them in
+	rows = read_not_in_table2(fileid_left, fileid_right, dbname)
+	filenames = [row['filename'] for row in rows]
+	return filenames
