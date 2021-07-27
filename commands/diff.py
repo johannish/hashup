@@ -2,6 +2,18 @@ import sys
 
 from util import files
 
+# Same leafname, and:
+#  - same hash, same path -> no diff
+#  - same hash, different path -> dup or moved
+#  - different hash, same path -> changed
+#  - different hash, different path -> dup, moved+changed, or distinct files
+#
+# Different leafname, and:
+#  - same hash, same path -> renamed
+#  - same hash, different path -> renamed(dup) or moved
+#  - different hash, same path -> distinct
+#  - different hash, different path -> distinct
+
 def diff(args):
 	fileid_compare = files.load_file(args.compare)
 	fileid_reference = files.load_file(args.reference)
